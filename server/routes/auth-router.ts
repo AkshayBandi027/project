@@ -7,6 +7,7 @@ import { lucia } from "../lucia"
 import { zValidator } from "@hono/zod-validator"
 import { loginSchema, signUpSchema } from "../../shared/types"
 import { eq } from "drizzle-orm"
+import { HTTPException } from "hono/http-exception"
 
 export const authRouter = new Hono<Context>()
   .post("/signup", zValidator("form", signUpSchema), async (c) => {
@@ -29,6 +30,7 @@ export const authRouter = new Hono<Context>()
       })
     } catch (error) {
       console.log(error)
+      throw new HTTPException(500, {message: "Internal Server Error"})
     }
   })
   .post("/login", zValidator("form", loginSchema), async (c) => {
@@ -39,14 +41,14 @@ export const authRouter = new Hono<Context>()
         where: eq(userTable.email, email),
       })
       if (!user) {
-        throw new Error("Invalid email or password")
+        throw new HTTPException( 401, {message: "Invalid email"})
       }
       const isPasswordCorrect = await Bun.password.verify(
         password,
         user.hashedPassword
       )
       if (!isPasswordCorrect) {
-        throw new Error("Invalid email or password")
+        throw new HTTPException( 401,{message: "Invalid password" })
       }
       const session = await lucia.createSession(user.id, {
         username: user.username,
@@ -57,6 +59,7 @@ export const authRouter = new Hono<Context>()
       })
     } catch (error) {
       console.log(error)
+      throw new HTTPException(500, {message: "Internal Server Error"})  
     }
   })
   .get("logout", async (c) => {
