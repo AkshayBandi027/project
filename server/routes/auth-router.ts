@@ -29,7 +29,7 @@ export const authRouter = new Hono<Context>()
         append: true,
       })
     } catch (error) {
-      console.log(error)
+      console.log("Error during creating user",error)
       throw new HTTPException(500, {message: "Internal Server Error"})
     }
   })

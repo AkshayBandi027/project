@@ -11,3 +11,8 @@ export const loginSchema = z.object({
     email: z.string().email(),
     password: z.string().min(3).max(30),
 })
+
+export const expenseSchema = z.object({
+    title: z.string().min(3).max(30),
+    amount: z.number().min(1).max(100000),
+})

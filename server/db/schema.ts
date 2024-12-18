@@ -1,4 +1,4 @@
-import { timestamp } from "drizzle-orm/pg-core"
+import { numeric, timestamp } from "drizzle-orm/pg-core"
 import { text } from "drizzle-orm/pg-core"
 import { pgTable } from "drizzle-orm/pg-core"
 
@@ -18,4 +18,17 @@ export const sessionTable = pgTable("session", {
     withTimezone: true,
     mode: "date",
   }).notNull()
+})
+
+export const expensesTable = pgTable("expenses", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => userTable.id),
+  title: text("title").notNull(),
+  amount: numeric("amount").notNull(),
+  createdAt: timestamp("created_at", {
+    withTimezone: true,
+    mode: "date",
+  }).defaultNow(),
 })
