@@ -4,6 +4,7 @@ import { lucia } from "./lucia"
 import type { Context } from "./context"
 import { authRouter } from "./routes/auth-router"
 import { HTTPException } from "hono/http-exception"
+import { expenseRouter } from "./routes/expense-router"
 
 const app = new Hono<Context>()
 
@@ -31,7 +32,10 @@ app.use("*", cors(), async (c, next) => {
   return next()
 })
 
-const routes = app.basePath("/api").route("/auth", authRouter)
+const routes = app
+  .basePath("/api")
+  .route("/auth", authRouter)
+  .route("/expense", expenseRouter)
 
 app.onError((err, c) => {
   if (err instanceof HTTPException) {
@@ -41,9 +45,8 @@ app.onError((err, c) => {
 })
 
 export default {
-    port: process.env.PORT ?? 3000,
-    hostname: "0.0.0.0",
-    fetch: app.fetch,
+  port: process.env.PORT ?? 3000,
+  hostname: "0.0.0.0",
+  fetch: app.fetch,
 }
 export type ApiRoutes = typeof routes
-
