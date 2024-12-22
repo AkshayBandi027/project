@@ -5,6 +5,7 @@ import type { Context } from "./context"
 import { authRouter } from "./routes/auth-router"
 import { HTTPException } from "hono/http-exception"
 import { expenseRouter } from "./routes/expense-router"
+import { serveStatic } from "hono/bun"
 
 const app = new Hono<Context>()
 
@@ -43,6 +44,10 @@ app.onError((err, c) => {
   }
   return c.text("Internal Server Error", 500)
 })
+
+
+app.get("*", serveStatic({ root: "./frontend/dist" }));
+app.get("*", serveStatic({ path: "./frontend/dist/index.html" }));
 
 export default {
   port: process.env.PORT ?? 3000,
