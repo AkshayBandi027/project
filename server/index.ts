@@ -6,16 +6,17 @@ import { authRouter } from "./routes/auth-router"
 import { HTTPException } from "hono/http-exception"
 import { expenseRouter } from "./routes/expense-router"
 import { serveStatic } from "hono/bun"
+import { logger } from "hono/logger"
 
 const app = new Hono<Context>()
 
+app.use(logger())
 app.use("*", cors(), async (c, next) => {
   const sessionId = lucia.readSessionCookie(c.req.header("Cookie") ?? "")
-
   if (!sessionId) {
     c.set("user", null)
-    c.set("session", null), next()
-    return
+    c.set("session", null)
+    return next()
   }
 
   const { session, user } = await lucia.validateSession(sessionId)
@@ -29,7 +30,8 @@ app.use("*", cors(), async (c, next) => {
       append: true,
     })
   }
-  c.set("session", session), c.set("user", user)
+  c.set("session", session)
+  c.set("user", user)
   return next()
 })
 
@@ -38,6 +40,7 @@ const routes = app
   .route("/auth", authRouter)
   .route("/expense", expenseRouter)
 
+
 app.onError((err, c) => {
   if (err instanceof HTTPException) {
     return c.json({ error: err.message }, err.status)
@@ -45,13 +48,12 @@ app.onError((err, c) => {
   return c.text("Internal Server Error", 500)
 })
 
-
-app.get("*", serveStatic({ root: "./frontend/dist" }));
-app.get("*", serveStatic({ path: "./frontend/dist/index.html" }));
+app.get("*", serveStatic({ root: "./frontend/dist" }))
+app.get("*", serveStatic({ path: "./frontend/dist/index.html" }))
 
 export default {
   port: process.env.PORT ?? 3000,
-  hostname: "0.0.0.0",
   fetch: app.fetch,
 }
+
 export type ApiRoutes = typeof routes

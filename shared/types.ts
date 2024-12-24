@@ -13,6 +13,21 @@ export const loginSchema = z.object({
 })
 
 export const expenseSchema = z.object({
-    title: z.string().min(3).max(30),
+    description: z.string().min(3).max(30),
     amount: z.number().min(1).max(100000),
+})
+
+export const expenseCategorySchema = z.object({
+    name: z.string().min(3).max(30),
+    icon: z.string().min(3).max(30),
+})
+
+export const incomeSchema = z.object({
+    description: z.string().min(3).max(30),
+    amount: z.number().min(1).max(100000),
+})
+
+export const incomeCategorySchema = z.object({
+    name: z.string().min(3).max(30),    
+    icon: z.string().min(3).max(30),
 })

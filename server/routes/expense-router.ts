@@ -7,23 +7,27 @@ import { db } from "../db-adapter"
 import { expensesTable } from "../db/schema"
 import { checkAuth } from "../middleware/checkAuth"
 import { eq } from "drizzle-orm"
+import { generateId } from "lucia"
 
 export const expenseRouter = new Hono<Context>()
   .post("/", checkAuth, zValidator("json", expenseSchema), async (c) => {
-    const { title, amount } = c.req.valid("json")
+    const { description, amount } = c.req.valid("json")
     const user = c.get("user")
+    const id = generateId(12)
 
     try {
-      const expense = await db
+      await db
         .insert(expensesTable)
         .values({
-          userId: user?.id as string,
-          title,
+          id,
+          userId: user?.id,
+          description,
           amount,
+          transactionDate: "",
         })
         .returning({
           id: expensesTable.id,
-          title: expensesTable.title,
+          description: expensesTable.description,
           amount: expensesTable.amount,
         })
     } catch (error) {
@@ -33,7 +37,7 @@ export const expenseRouter = new Hono<Context>()
   })
   .get("/:id", checkAuth, async (c) => {
     const id = c.req.param("id")
-    const expense = await db.query.expensesTable.findFirst({
+    const expense = await db.query.expenses.findFirst({
       where: eq(expensesTable.id, id),
     })
 

@@ -28,9 +28,10 @@ export const authRouter = new Hono<Context>()
       c.header("Set-Cookie", sessionCookie, {
         append: true,
       })
+      return c.json({ message: "User created successfully" })
     } catch (error) {
-      console.log("Error during creating user",error)
-      throw new HTTPException(500, {message: "Internal Server Error"})
+      console.log("Error during creating user", error)
+      throw new HTTPException(500, { message: "Failed to create user" })
     }
   })
   .post("/login", zValidator("form", loginSchema), async (c) => {
@@ -41,14 +42,14 @@ export const authRouter = new Hono<Context>()
         where: eq(userTable.email, email),
       })
       if (!user) {
-        throw new HTTPException( 401, {message: "Invalid email"})
+        throw new HTTPException(401, { message: "Invalid email" })
       }
       const isPasswordCorrect = await Bun.password.verify(
         password,
         user.hashedPassword
       )
       if (!isPasswordCorrect) {
-        throw new HTTPException( 401,{message: "Invalid password" })
+        throw new HTTPException(401, { message: "Invalid password" })
       }
       const session = await lucia.createSession(user.id, {
         username: user.username,
@@ -59,7 +60,7 @@ export const authRouter = new Hono<Context>()
       })
     } catch (error) {
       console.log(error)
-      throw new HTTPException(500, {message: "Internal Server Error"})  
+      throw new HTTPException(500, { message: "Internal Server Error" })
     }
   })
   .get("logout", async (c) => {

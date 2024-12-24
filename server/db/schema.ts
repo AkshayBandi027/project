@@ -1,6 +1,4 @@
-import { numeric, timestamp } from "drizzle-orm/pg-core"
-import { text } from "drizzle-orm/pg-core"
-import { pgTable } from "drizzle-orm/pg-core"
+import { pgTable, text, numeric, timestamp } from "drizzle-orm/pg-core"
 
 export const userTable = pgTable("user", {
   id: text("id").primaryKey(),
@@ -21,7 +19,7 @@ export const sessionTable = pgTable("session", {
 })
 
 export const expensesTable = pgTable("expenses", {
-  id: text("id").primaryKey(),
+  id: text("id").primaryKey().notNull(),
   userId: text("user_id")
     .notNull()
     .references(() => userTable.id),
@@ -41,7 +39,7 @@ export const expensesTable = pgTable("expenses", {
 })
 
 export const expenseCatgoriesTable = pgTable("expense_categories", {
-  id: text("id").primaryKey(),
+  id: text("id").primaryKey().notNull(),
   userId: text("user_id")
     .references(() => userTable.id)
     .notNull(),
@@ -54,8 +52,8 @@ export const expenseCatgoriesTable = pgTable("expense_categories", {
 })
 
 export const incomeTable = pgTable("income", {
-  id: text("id").primaryKey(),
-  usedId: text("user_id")
+  id: text("id").primaryKey().notNull(),
+  userId: text("user_id")
     .notNull()
     .references(() => userTable.id),
   description: text("description").notNull(),
@@ -74,7 +72,7 @@ export const incomeTable = pgTable("income", {
 })
 
 export const incomeCategoriesTable = pgTable("income_categories", {
-  id: text("id").primaryKey(),
+  id: text("id").primaryKey().notNull(),
   userId: text("user_id")
     .notNull()
     .references(() => userTable.id),
