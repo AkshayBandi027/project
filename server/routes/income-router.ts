@@ -60,7 +60,7 @@ export const incomeRouter = new Hono<Context>()
     })
   })
   .post(
-    "/catgory",
+    "/category",
     checkAuth,
     zValidator("json", incomeCategorySchema),
     async (c) => {
